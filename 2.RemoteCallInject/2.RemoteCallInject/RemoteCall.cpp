@@ -3,13 +3,38 @@
 
 #include "Inject.h"
 
+
+
+typedef struct _parglist {
+	HWND m_hHwnd;
+	char m_strCaption[100];
+	char m_strText[100];
+	UINT m_uType;
+} parglist;
 //获取游戏进程的句柄
 //向指定进程写入我们的代码
 DWORD WINAPI ThreadProc_Msg(
 	LPVOID lpParameter
 )
 {
-	MessageBox(0, "内容", "标题", (DWORD)lpParameter);
+	//MessageBox(0, "内容", "标题", (UINT)lpParameter);
+
+	parglist* parglist1 = (parglist*)lpParameter;
+	UINT utype = parglist1->m_uType;
+	char *pText = parglist1->m_strText;
+	char *pCaption = parglist1->m_strCaption;
+	HWND hHwnd = parglist1->m_hHwnd;
+	_asm
+	{
+		push utype
+		push pText
+		push pCaption
+		push hHwnd
+		mov eax,0x75fdfd1e
+		call eax
+	}
+	
+
 	return 1;
 }
 int main()
@@ -26,10 +51,22 @@ int main()
 	//1.在游戏空间分配内存空间，以写入代码
 	//2.在游戏空间分配空间，以写入参数
 	LPVOID pCall = VirtualAllocEx(hp, NULL, 0x6000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	DWORD byWriteSize = 0;
+	
+	SIZE_T byWriteSize = 0;
 	BOOL bIsWriteCall = WriteProcessMemory(hp, pCall, ThreadProc_Msg, 0x6000, &byWriteSize);
 	
 
+	parglist arglist;
+	arglist.m_hHwnd = NULL;
+	strcpy_s(arglist.m_strCaption, "这个是标题33333");
+	strcpy_s(arglist.m_strText, "这个是文本内容6666");
+	arglist.m_uType = MB_OK;
+
+	LPVOID pArg = VirtualAllocEx(hp, NULL, sizeof(parglist), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	bIsWriteCall = WriteProcessMemory(hp, pArg, &arglist, sizeof(parglist), &byWriteSize);
+
+	CreateRemoteThread(hp, 0, 0, (LPTHREAD_START_ROUTINE)pCall, pArg, 0, 0);
+	getchar();
 	return 0;
 }
 

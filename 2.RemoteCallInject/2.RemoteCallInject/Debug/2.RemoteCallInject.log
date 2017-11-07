@@ -1,0 +1,4 @@
+﻿  RemoteCall.cpp
+e:\code\game\game\2.remotecallinject\2.remotecallinject\remotecall.cpp(78): warning C4477: “printf”: 格式字符串“%08X”需要类型“unsigned int”的参数，但可变参数 1 拥有了类型“HANDLE”
+  2.RemoteCallInject.vcxproj -> E:\Code\Game\game\2.RemoteCallInject\Debug\2.RemoteCallInject.exe
+  2.RemoteCallInject.vcxproj -> E:\Code\Game\game\2.RemoteCallInject\Debug\2.RemoteCallInject.pdb (Full PDB)
