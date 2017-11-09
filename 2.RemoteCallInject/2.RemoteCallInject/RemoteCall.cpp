@@ -25,14 +25,18 @@ DWORD WINAPI ThreadProc_Msg(
 	char *pText = parglist1->m_strText;
 	char *pCaption = parglist1->m_strCaption;
 	HWND hHwnd = parglist1->m_hHwnd;
+
+
 	DWORD dwCall = parglist1->m_dwCall;
+
+
 	_asm
 	{
 		push utype
 		push pText
 		push pCaption
 		push hHwnd
-		mov eax, dwCall
+
 		call dwCall
 	}
 	
@@ -56,6 +60,7 @@ void InjectRemoteMessageBox(TCHAR* szCaption, TCHAR* szText, UINT uType,DWORD dw
 	LPVOID pCall = VirtualAllocEx(hp, NULL, 0x100, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
 	SIZE_T byWriteSize = 0;
+
 	BOOL bIsWriteCall = WriteProcessMemory(hp, pCall, &ThreadProc_Msg, 0x100, &byWriteSize);
 
 	parglist arglist;
